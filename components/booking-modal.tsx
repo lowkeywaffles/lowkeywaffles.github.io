@@ -8,9 +8,9 @@ import * as z from 'zod';
 const bookingSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
-  phone: z.string().min(10, 'Phone number must be valid'),
+  phone: z.string().min(9, 'Phone number must be valid'),
   checkInDate: z.string().min(1, 'Check-in date is required'),
-  duration: z.string().min(1, 'Duration is required'),
+  duration: z.coerce.number().min(1, 'Duration must be at least 1 month').max(36, 'Duration cannot exceed 36 months'),
   notes: z.string().optional(),
   paymentMethod: z.enum(['paypal', 'telebirr'], {
     errorMap: () => ({ message: 'Please select a payment method' }),
@@ -63,11 +63,17 @@ export default function BookingModal({
   const price = PRICES[roomType];
   const selectedPriceValue =
     selectedPrice === 'min' ? price.usd.min : price.usd.max;
-  const totalCost = selectedPriceValue * (parseInt(duration) || 1);
+  const durationNum = typeof duration === 'string' ? parseInt(duration) : duration || 1;
+  const totalCost = selectedPriceValue * durationNum;
   const securityDeposit = Math.round(totalCost * SECURITY_DEPOSIT_PERCENT);
   const totalAmount = totalCost + securityDeposit;
 
   const onSubmit = (data: BookingFormData) => {
+    console.log("[v0] Form submitted:", data);
+    if (!data.paymentMethod) {
+      console.log("[v0] No payment method selected");
+      return;
+    }
     setBookingData(data);
     setPaymentMethod(data.paymentMethod as 'paypal' | 'telebirr');
     setStep('payment');
@@ -258,7 +264,8 @@ export default function BookingModal({
                   </label>
                   <input
                     {...register('checkInDate')}
-                    type="date"
+                    type="text"
+                    placeholder="MM/DD/YYYY"
                     className="w-full px-4 py-2 bg-muted rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
                   {errors.checkInDate && (
@@ -272,9 +279,10 @@ export default function BookingModal({
                     Duration (months)
                   </label>
                   <input
-                    {...register('duration')}
+                    {...register('duration', { valueAsNumber: true })}
                     type="number"
                     min="1"
+                    max="36"
                     placeholder="1"
                     className="w-full px-4 py-2 bg-muted rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/50"
                   />
@@ -296,6 +304,35 @@ export default function BookingModal({
                   rows={3}
                   className="w-full px-4 py-2 bg-muted rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-medium">Payment Method</label>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-muted/30">
+                    <input
+                      {...register('paymentMethod')}
+                      type="radio"
+                      value="paypal"
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">PayPal</span>
+                  </label>
+                  <label className="flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-muted/30">
+                    <input
+                      {...register('paymentMethod')}
+                      type="radio"
+                      value="telebirr"
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm">Telebirr</span>
+                  </label>
+                </div>
+                {errors.paymentMethod && (
+                  <p className="text-destructive text-sm">
+                    {errors.paymentMethod.message}
+                  </p>
+                )}
               </div>
 
               <button
@@ -320,7 +357,7 @@ export default function BookingModal({
                   </div>
                   <div className="flex justify-between">
                     <span>Duration:</span>
-                    <span>{duration} month{duration !== '1' ? 's' : ''}</span>
+                    <span>{durationNum} month{durationNum !== 1 ? 's' : ''}</span>
                   </div>
                   <div className="flex justify-between font-semibold border-t border-border pt-2">
                     <span>Subtotal:</span>
