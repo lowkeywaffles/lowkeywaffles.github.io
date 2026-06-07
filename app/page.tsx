@@ -263,7 +263,9 @@ export default function Page() {
               </p>
               <div className="space-y-4">
                 {[
-                  'High-speed WiFi & Smart TV',
+                  'WiFi on Every Floor',
+                  'Smart TVs in 2-Bedroom Units',
+                  'High-speed Internet & Streaming',
                   'Air Conditioning & Premium Heating',
                   'Modern Kitchen Appliances',
                   'Quality Bedding & Linens',
@@ -334,6 +336,52 @@ export default function Page() {
                 <p className="text-muted-foreground">1-Bedroom Units</p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Compound Features Section */}
+      <section className="py-24 bg-gradient-to-b from-background to-secondary/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">Secure & Convenient Living</h2>
+            <p className="text-xl text-muted-foreground">Premium compound with excellent location and amenities</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                title: 'Security Guards',
+                description: 'Professional security personnel stationed at both gates ensuring safety 24/7',
+                icon: '🔒',
+              },
+              {
+                title: 'Safe Environment',
+                description: 'Well-secured compound perfect for safe walking and peace of mind',
+                icon: '✓',
+              },
+              {
+                title: 'Mini Stores Nearby',
+                description: 'Convenient access to shops and retail stores within walking distance',
+                icon: '🛍️',
+              },
+              {
+                title: 'Public Transport',
+                description: 'Close proximity to bus stations and public transportation hubs',
+                icon: '🚌',
+              },
+            ].map((feature, idx) => (
+              <div
+                key={idx}
+                className="group bg-card rounded-xl p-8 border border-border/50 hover:border-primary transition-all hover:shadow-lg hover:scale-105 transform"
+              >
+                <div className="text-4xl mb-4 group-hover:scale-125 transition-transform">{feature.icon}</div>
+                <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
+                  {feature.title}
+                </h3>
+                <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

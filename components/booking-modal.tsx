@@ -4,6 +4,9 @@ import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { DayPicker } from 'react-day-picker';
+import { format } from 'date-fns';
+import 'react-day-picker/dist/style.css';
 
 const bookingSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -47,7 +50,9 @@ export default function BookingModal({
   const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'telebirr' | null>(null);
   const [telebirrProof, setTelebirrProof] = useState<File | null>(null);
   const [processingMessage, setProcessingMessage] = useState('');
+  const [showCalendar, setShowCalendar] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const calendarRef = useRef<HTMLDivElement>(null);
 
   const {
     register,
@@ -179,7 +184,7 @@ export default function BookingModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md bg-background rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 max-h-[90vh] overflow-y-auto">
+      <div className="w-full max-w-md bg-background rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-primary/90 to-primary p-6 text-primary-foreground sticky top-0">
           <button
@@ -192,7 +197,7 @@ export default function BookingModal({
           <p className="text-sm opacity-90">Complete your booking</p>
         </div>
 
-        <div className="p-6">
+        <div className="p-6 overflow-y-auto flex-1">
           {/* Step Indicators */}
           <div className="flex gap-2 mb-8">
             {['details', 'payment', 'processing', 'confirmation'].map((s, i) => (
@@ -262,12 +267,59 @@ export default function BookingModal({
                   <label className="block text-sm font-medium mb-2">
                     Check-in Date
                   </label>
-                  <input
-                    {...register('checkInDate')}
-                    type="text"
-                    placeholder="MM/DD/YYYY"
-                    className="w-full px-4 py-2 bg-muted rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  />
+                  <div className="relative" ref={calendarRef}>
+                    <input
+                      {...register('checkInDate')}
+                      type="text"
+                      placeholder="Click to select date"
+                      readOnly
+                      onClick={() => setShowCalendar(!showCalendar)}
+                      className="w-full px-4 py-2 bg-muted rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
+                    />
+                    {showCalendar && (
+                      <div className="fixed bg-card border border-border rounded-lg shadow-2xl p-4 z-[9999]">
+                        <DayPicker
+                          mode="single"
+                          selected={
+                            watch('checkInDate')
+                              ? new Date(watch('checkInDate'))
+                              : undefined
+                          }
+                          onSelect={(date) => {
+                            if (date) {
+                              const formatted = format(date, 'MM/dd/yyyy');
+                              // Manually set the value in the form
+                              setTimeout(
+                                () =>
+                                  (
+                                    document.querySelector(
+                                      'input[name="checkInDate"]'
+                                    ) as HTMLInputElement
+                                  ).value = formatted,
+                                0
+                              );
+                              // Trigger the form update
+                              const dateInput = document.querySelector(
+                                'input[name="checkInDate"]'
+                              ) as HTMLInputElement;
+                              if (dateInput) {
+                                dateInput.dispatchEvent(
+                                  new Event('input', { bubbles: true })
+                                );
+                              }
+                              setShowCalendar(false);
+                            }
+                          }}
+                          disabled={(date) => {
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0);
+                            return date < today;
+                          }}
+                          className="text-sm"
+                        />
+                      </div>
+                    )}
+                  </div>
                   {errors.checkInDate && (
                     <p className="text-destructive text-sm mt-1">
                       {errors.checkInDate.message}
