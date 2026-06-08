@@ -78,7 +78,7 @@ export default function Page() {
           }}
         >
           <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-white mb-6 leading-tight text-balance drop-shadow-lg">
-            Premium Furnished Apartments
+            Modern Furnished Apartments
           </h2>
           <p className="text-xl sm:text-2xl text-gray-50 mb-8 font-light drop-shadow-md">
             Elegant living in the heart of Megenagna
@@ -120,7 +120,7 @@ export default function Page() {
               <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/30 transition">
                 <Zap className="w-6 h-6 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-1">Premium Units</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-1">Modern Units</h3>
               <p className="text-muted-foreground">4 Floors • 8 Units Total</p>
             </div>
           </div>
@@ -131,7 +131,7 @@ export default function Page() {
       <section id="rooms" className="py-24 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">Our Premium Units</h2>
+            <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">Our Modern Units</h2>
             <p className="text-xl text-muted-foreground">Choose from 2 elegant options on each of our 4 floors</p>
           </div>
 
@@ -182,7 +182,7 @@ export default function Page() {
                   </li>
                   <li className="flex items-start gap-3">
                     <span className="text-primary font-bold mt-0.5">✓</span>
-                    <span className="text-foreground">Premium furnishings & appliances</span>
+                    <span className="text-foreground">Modern furnishings & appliances</span>
                   </li>
                 </ul>
                 <button
@@ -257,7 +257,7 @@ export default function Page() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">Premium Amenities</h2>
+              <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-6">Modern Amenities</h2>
               <p className="text-lg text-muted-foreground mb-10 leading-relaxed">
                 Each unit is meticulously furnished and equipped with modern amenities to ensure your comfort and convenience.
               </p>
@@ -352,7 +352,7 @@ export default function Page() {
             {[
               {
                 title: 'Security Guards',
-                description: 'Professional security personnel stationed at both gates ensuring safety 24/7',
+                description: 'Security personnel stationed at both gates ensuring safety 24/7',
                 icon: '🔒',
               },
               {
@@ -403,7 +403,7 @@ export default function Page() {
               <span className="text-lg font-semibold">+251 911 654 766</span>
             </a>
             <a
-              href="https://maps.google.com/maps?q=Megenagna,+Addis+Ababa"
+              href="https://maps.app.goo.gl/n9c1C1v2p331TMxa6"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white/20 hover:bg-white/30 transition-all rounded-lg p-6 flex items-center justify-center gap-3 transform hover:scale-105"
