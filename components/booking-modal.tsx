@@ -493,6 +493,16 @@ export default function BookingModal({
                       <li>Upload the screenshot below</li>
                     </ol>
                   </div>
+                  
+                  {/* Telebirr QR Code */}
+                  <div className="flex justify-center">
+                    <img 
+                      src="/telebirr-qr.jpg" 
+                      alt="Telebirr QR Code" 
+                      className="w-48 h-48 rounded-lg border-2 border-amber-300"
+                    />
+                  </div>
+                  
                   <div>
                     <label className="block text-sm font-medium mb-2">
                       Upload Payment Proof
