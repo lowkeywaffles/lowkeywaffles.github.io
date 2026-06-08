@@ -436,8 +436,8 @@ export default function Page() {
       {/* Footer */}
       <footer className="bg-foreground text-background py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="mb-2">© 2025 Maranatha Furnished Apartments. All rights reserved.</p>
-          <p className="text-sm opacity-75">Premium luxury living in the heart of Addis Ababa</p>
+          <p className="mb-2">© 2026 Maranatha Furnished Apartments. All rights reserved.</p>
+          <p className="text-sm opacity-75">Luxuray living in the heart of Addis Ababa</p>
         </div>
       </footer>
 
