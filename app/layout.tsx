@@ -11,7 +11,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Maranatha Furnished Apartment | Luxury Living in Addis Ababa',
-  description: 'Premium furnished apartments in Megenagna, Addis Ababa. 4 floors with 2-3 bedroom units. Elegant, modern, and fully equipped.',
+  description: 'Maranatha Furnished Apartments in Megenagna, Addis Ababa. 4 floors with 2-3 bedroom units. Elegant, modern, and fully equipped.',
   generator: 'v0.app',
   icons: {
     icon: [
