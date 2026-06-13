@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { neon } from '@neondatabase/serverless';
+import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
 // Send booking notification email
@@ -238,6 +238,7 @@ if (
     console.error('[DB Error]', dbError);
     // Don't fail the payment response if DB write fails
   }
+
 
           // Send booking notification email
           await sendBookingNotification(body.bookingData, body.amount, 'paypal');
