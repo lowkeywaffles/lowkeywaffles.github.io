@@ -231,10 +231,14 @@ if (
       )
     `;
 
-    console.log('[DB] Booking saved and room marked as reserved');
-  } catch (dbError) {
-    console.error('[DB Error]', dbError);
-    // Don't fail the payment response if DB write fails
+} catch (dbError: any) {
+    console.error('[DB Error]', dbError?.message || dbError);
+    // Temporarily return the error so we can see it
+    return NextResponse.json({
+      success: true,
+      message: 'Payment processed successfully',
+      dbError: dbError?.message || String(dbError),
+    });
   }
 
 
