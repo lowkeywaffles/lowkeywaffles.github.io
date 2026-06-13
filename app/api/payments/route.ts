@@ -1,3 +1,4 @@
+import { neon } from '@neondatabase/serverless';
 import { NextRequest, NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 
@@ -181,16 +182,63 @@ export async function POST(request: NextRequest) {
         // Capture PayPal order
         const capturedOrder = await capturePayPalOrder(body.orderID);
 
-        if (
-          capturedOrder.status === 'COMPLETED' ||
-          capturedOrder.status === 'APPROVED'
-        ) {
-          // Log booking
-          console.log('[Payment] PayPal payment successful:', {
-            orderID: body.orderID,
-            bookingData: body.bookingData,
-            timestamp: new Date().toISOString(),
-          });
+if (
+  capturedOrder.status === 'COMPLETED' ||
+  capturedOrder.status === 'APPROVED'
+) {
+  // Log booking
+  console.log('[Payment] PayPal payment successful:', {
+    orderID: body.orderID,
+    bookingData: body.bookingData,
+    timestamp: new Date().toISOString(),
+  });
+
+  // Save booking + mark room as reserved in Neon
+  try {
+    const db = neon(process.env.DATABASE_URL!);
+    const { bookingData } = body;
+
+    const checkOutDate = new Date(bookingData.checkInDate);
+    checkOutDate.setMonth(checkOutDate.getMonth() + (bookingData.duration || 1));
+
+    await db`
+      INSERT INTO bookings (
+        paypal_order_id, guest_name, guest_email, guest_phone,
+        room_type, check_in_date, check_out_date, duration,
+        amount, notes, status
+      ) VALUES (
+        ${body.orderID},
+        ${bookingData.name},
+        ${bookingData.email},
+        ${bookingData.phone},
+        ${bookingData.roomType},
+        ${bookingData.checkInDate},
+        ${checkOutDate.toISOString().split('T')[0]},
+        ${bookingData.duration},
+        ${body.amount},
+        ${bookingData.notes || ''},
+        'confirmed'
+      )
+    `;
+
+    // Mark a room of the correct type as reserved
+    await db`
+      UPDATE rooms
+      SET status = 'reserved'
+      WHERE id = (
+        SELECT id FROM rooms
+        WHERE room_type = ${bookingData.roomType}
+        AND status = 'available'
+        LIMIT 1
+      )
+    `;
+
+    console.log('[DB] Booking saved and room marked as reserved');
+  } catch (dbError) {
+    console.error('[DB Error]', dbError);
+    // Don't fail the payment response if DB write fails
+  }
+
 
           // Send booking notification email
           await sendBookingNotification(body.bookingData, body.amount, 'paypal');
