@@ -193,7 +193,7 @@ if (
 
   // Save booking + mark room as reserved in Neon
   try {
-    const db = neon(process.env.DATABASE_URL!);
+    const db = neon(process.env.POSTGRES_URL!);
     const { bookingData } = body;
 
     const checkOutDate = new Date(bookingData.checkInDate);
