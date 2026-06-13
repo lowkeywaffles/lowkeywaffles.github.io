@@ -195,6 +195,7 @@ if (
   try {
     const db = neon(process.env.POSTGRES_URL!);
     const { bookingData } = body;
+    console.log('[DB URL]', process.env.POSTGRES_URL?.slice(0, 50));
 
     const checkOutDate = new Date(bookingData.checkInDate);
     checkOutDate.setMonth(checkOutDate.getMonth() + (bookingData.duration || 1));
