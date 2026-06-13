@@ -53,9 +53,7 @@ async function sendBookingNotification(bookingData: any, amount: number, payment
     console.error('[Email Error]', error);
   }
 }
-const PAYPAL_API_URL = process.env.NODE_ENV === 'production'
-  ? 'https://api.paypal.com'
-  : 'https://api.sandbox.paypal.com';
+const PAYPAL_API_URL = 'https://api.sandbox.paypal.com';
 
 // Create PayPal order
 async function createPayPalOrder(
