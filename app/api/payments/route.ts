@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { neon } from '@neondatabase/serverless';
 import nodemailer from 'nodemailer';
 
 // Send booking notification email
