@@ -60,9 +60,10 @@ async function createPayPalOrder(
   amount: number,
   bookingData: any
 ) {
-  const auth = Buffer.from(
-    `${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET}`
-  ).toString('base64');
+  const clientId = process.env.PAYPAL_CLIENT_ID || process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+  const clientSecret = process.env.PAYPAL_CLIENT_SECRET || process.env.PAYPAL_SECRET;
+  if (!clientId || !clientSecret) throw new Error('PayPal sandbox credentials are not configured');
+  const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
   const response = await fetch(`${PAYPAL_API_URL}/v2/checkout/orders`, {
     method: 'POST',
@@ -98,9 +99,10 @@ async function createPayPalOrder(
 
 // Capture PayPal order
 async function capturePayPalOrder(orderID: string) {
-  const auth = Buffer.from(
-    `${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}:${process.env.PAYPAL_SECRET}`
-  ).toString('base64');
+  const clientId = process.env.PAYPAL_CLIENT_ID || process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+  const clientSecret = process.env.PAYPAL_CLIENT_SECRET || process.env.PAYPAL_SECRET;
+  if (!clientId || !clientSecret) throw new Error('PayPal sandbox credentials are not configured');
+  const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
   const response = await fetch(
     `${PAYPAL_API_URL}/v2/checkout/orders/${orderID}/capture`,
@@ -180,10 +182,7 @@ export async function POST(request: NextRequest) {
         // Capture PayPal order
         const capturedOrder = await capturePayPalOrder(body.orderID);
 
-if (
-  capturedOrder.status === 'COMPLETED' ||
-  capturedOrder.status === 'APPROVED'
-) {
+if (capturedOrder.status === 'COMPLETED') {
   // Log booking
   console.log('[Payment] PayPal payment successful:', {
     orderID: body.orderID,

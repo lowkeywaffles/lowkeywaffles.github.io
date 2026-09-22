@@ -85,62 +85,69 @@ export default function BookingModal({
   };
 
   const handlePayPalPayment = async () => {
-    if (!bookingData) return;
+    if (!bookingData || typeof window === 'undefined') return;
 
     setStep('processing');
     setProcessingMessage('Redirecting to PayPal...');
 
     try {
-      // Initialize PayPal
-      if (typeof window !== 'undefined' && !(window as any).paypal) {
+      const paypal = await new Promise<any>((resolve, reject) => {
+        if ((window as any).paypal) {
+          resolve((window as any).paypal);
+          return;
+        }
+
+        const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+        if (!clientId) {
+          reject(new Error('PayPal client ID is not configured'));
+          return;
+        }
+
         const script = document.createElement('script');
-        script.src = `https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}`;
+        script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=USD&intent=capture`;
         script.async = true;
+        script.onload = () => resolve((window as any).paypal);
+        script.onerror = () => reject(new Error('Unable to load PayPal'));
         document.body.appendChild(script);
-        script.onload = () => {
-          (window as any).paypal.Buttons({
-            createOrder: async (data: any, actions: any) => {
-              return await fetch('/api/payments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  method: 'paypal',
-                  amount: totalAmount,
-                  currency: 'USD',
-                  bookingData,
-                }),
-              })
-                .then((res) => res.json())
-                .then((data) => data.orderID);
-            },
-            onApprove: async (data: any, actions: any) => {
-              setProcessingMessage('Completing payment...');
-              return await fetch('/api/payments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  method: 'paypal-capture',
-                  orderID: data.orderID,
-                  bookingData,
-                }),
-              })
-                .then((res) => res.json())
-                .then((data) => {
-                  if (data.success) {
-                    setStep('confirmation');
-                  }
-                });
-            },
-            onError: (err: any) => {
-              setProcessingMessage('Payment failed. Please try again.');
-              console.error('PayPal error:', err);
-            },
-          }).render('#paypal-container');
-        };
-      }
+      });
+
+      const container = document.querySelector('#paypal-container');
+      if (!container) throw new Error('PayPal container is unavailable');
+      container.innerHTML = '';
+
+      await paypal.Buttons({
+        createOrder: async () => {
+          const response = await fetch('/api/payments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ method: 'paypal', amount: totalAmount, currency: 'USD', bookingData }),
+          });
+          const result = await response.json();
+          if (!response.ok || !result.orderID) throw new Error(result.message || 'Could not create PayPal order');
+          return result.orderID;
+        },
+        onApprove: async (data: any) => {
+          setProcessingMessage('Completing payment...');
+          const response = await fetch('/api/payments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ method: 'paypal-capture', orderID: data.orderID, amount: totalAmount, bookingData }),
+          });
+          const result = await response.json();
+          if (!response.ok || !result.success) throw new Error(result.message || 'Payment capture failed');
+          setStep('confirmation');
+        },
+        onCancel: () => setStep('payment'),
+        onError: (error: unknown) => {
+          console.error('[v0] PayPal checkout error:', error);
+          setProcessingMessage('Payment failed. Please check your sandbox account and try again.');
+          setStep('payment');
+        },
+      }).render('#paypal-container');
     } catch (error) {
-      console.error('Error setting up PayPal:', error);
-      setProcessingMessage('Error setting up payment. Please try again.');
+      console.error('[v0] Error setting up PayPal:', error);
+      setProcessingMessage(error instanceof Error ? error.message : 'Error setting up payment. Please try again.');
+      setStep('payment');
     }
   };
 
